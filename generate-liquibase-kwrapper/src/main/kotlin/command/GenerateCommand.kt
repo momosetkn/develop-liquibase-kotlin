@@ -1,5 +1,6 @@
 package momosetkn.command
 
+import StringUtils.toCamelCase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
@@ -102,13 +103,6 @@ private fun item(tr: Element): Item? {
 }
 
 val delimiter = Regex("[ -]")
-fun String.toCamelCase(): String {
-    return this.split(delimiter)
-        .joinToString("") {
-            it.replaceFirstChar(Char::uppercaseChar)
-        }
-        .replaceFirstChar { it.lowercase() }
-}
 
 private data class Item(
     val liquibaseName: String,
