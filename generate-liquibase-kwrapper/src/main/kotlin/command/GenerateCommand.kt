@@ -70,13 +70,16 @@ private fun format(
             fun $methodName(
                 $formatedArgs
             ) {
-                val argsList = listOfNotNull(
-                                $commandArray
-                                $assignParams
-                                )
-        executeLiquibaseCommandLine(
-            argsList.toTypedArray(),
-        )
+                setSystemEnvArgs()
+                val argsList = listOf(
+                getGlobalArgs(),
+                 listOfNotNull(
+                    $commandArray
+                    $assignParams
+                    ),
+            getCommandArgs()
+        ).flatten()
+        executeLiquibaseCommandLine(argsList)
             }
 
     """.trimIndent()
