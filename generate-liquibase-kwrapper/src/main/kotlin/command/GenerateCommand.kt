@@ -20,6 +20,7 @@ fun generateCommand(uri: String): String {
     }
     val commandArray = command
         .split(" ")
+        .map { it.toCamelCase() }
         .joinToString("") { "\"$it\"," }
     val methodName = command.toCamelCase()
     val tables = doc.select("#cli > table")
@@ -40,9 +41,9 @@ fun generateCommand(uri: String): String {
     val assignParams =
         items.joinToString("\n") {
             if (it.required) {
-                "\"${it.liquibaseName}=\$${it.name}\""
+                "\"${it.liquibaseName.removePrefix("--")}\" to ${it.name}"
             } else {
-                val body = "\"${it.liquibaseName}=\$it\""
+                val body = "\"${it.liquibaseName.removePrefix("--")}\" to ${it.name}"
                 "${it.name}?.let { $body }"
             } + ","
         }
@@ -70,17 +71,18 @@ private fun format(
             fun $methodName(
                 $formatedArgs
             ) {
-                setSystemEnvArgs()
                 val argsList = listOf(
-                getGlobalArgs(),
+                globalArgs,
                  listOfNotNull(
-                    $commandArray
                     $assignParams
                     ),
-            getCommandArgs()
+            commandArgs,
         ).flatten()
-        executeLiquibaseCommandLine(argsList)
-            }
+        executeCommand(
+            command = listOf($commandArray),
+            args = argsList,
+        )
+        }
 
     """.trimIndent()
 
